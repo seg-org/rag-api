@@ -1,4 +1,6 @@
-# rag-bot
+# rag-api
+
+## Repositories
 
 - [bot](https://github.com/seg-org/rag-bot)
 - [api](https://github.com/seg-org/rag-api)
@@ -7,32 +9,28 @@ Making a bot that can **leverage chat context** with **RAG** to generate consist
 
 ## Stack
 
-- discordjs
+- langchain
 
 ## Getting Started
 
 ### Prerequisites
 
 - 💻
-- bun
-- node 20
-- [discord bot](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot)
+- python 3
 
 ### Installation
 
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 1. Clone this repo
 2. Copy `.env.template` and paste it in the same directory as `.env` and fill in the values.
 
 ```bash
-NODE_ENV=development
 DB_URL=postgresql://root:1234@localhost:5432/db
 MSG_EXPIRY_SEC=604800 # 1 week
 MAX_EMBED_DIST=0.7
 ENABLE_PROMPT_CONFIG=true # whether to use prompt_config.json, false = use default chatgpt tone
-
-BOT_TOKEN=
-BOT_CLIENT_ID=
-GUILD_ID=
 
 OPENAI_TOKEN=
 ```
