@@ -10,6 +10,7 @@ Making a bot that can **leverage chat context** with **RAG** to generate consist
 ## Stack
 
 - langchain
+- fastapi
 
 ## Getting Started
 
@@ -27,23 +28,21 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 2. Copy `.env.template` and paste it in the same directory as `.env` and fill in the values.
+```bash
+# for these, see README.md in the bot repo
+BOT_TOKEN=
+BOT_CLIENT_ID=
+GUILD_ID=
+
+# go to https://platform.openai.com/account/api-keys (you need to top-up some $$ first)
+OPENAI_API_KEY=
+
+# go to https://smith.langchain.com and create an account + api key
+LANGCHAIN_API_KEY=
+```
 3. Copy `prompt_config.example.json` in `./src/config` and paste it in the same directory as `prompt_config.json` and fill in the desired base prompt (what tone should the bot respond to your messages) or keep it as is.
-4. Download dependencies by `bun i`
-
-### Setting up your discord bot
-
-1. Go to the [discord developer portal](https://discord.com/developers/applications).
-2. Create a new application
-
-- In `Bot` tab, click `Reset Token` to get your bot's access token, it is the `BOT_TOKEN` field in `.env`.
-- In `General Information` tab, the `Application ID` is the `BOT_CLIENT_ID` field in `.env`.
-- For `GUILD_ID`, go to your discord server, right click on the server icon and click `Copy ID`.
-
-3. To add the bot to your server, go to `OAuth2` tab, check `bot` in `scopes` and `Administrator` (or less permissions as see fit) in `bot permissions`, then copy the link and paste it in a new tab on your browser.
-4. For `OPENAI_TOKEN`, go to the [openai dashboard](https://platform.openai.com/account/api-keys) and create a new API key, you need to top-up some $$ first.
 
 ### Running
 
-1. For the first time, run `bun deploy-commands` to deploy the commands to the discord server.
-2. Run `docker-compose up -d` to start vector database.
-3. Run `bun dev` to start local bot.
+1. Run `docker-compose up -d` to start vector database and bot.
+2. Run `make dev` or `make watch` to start local api.
