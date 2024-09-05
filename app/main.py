@@ -2,7 +2,7 @@ import uvicorn
 from config import config
 from fastapi import APIRouter, FastAPI
 from llm import LLM
-from models import AddTextRequest, CompleteChatRequest
+from models import AddTextRequest
 
 app = FastAPI()
 router = APIRouter(prefix="/api/v1")
@@ -15,8 +15,8 @@ async def root():
 
 
 @router.get("/complete-chat")
-def complete_chat(request: CompleteChatRequest):
-    reply = llm.complete_chat(request.text)
+def complete_chat(text: str = None):
+    reply = llm.complete_chat(text)
 
     return {"reply": reply}
 

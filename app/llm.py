@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 from langchain_core.chat_history import (
@@ -26,12 +27,20 @@ class LLM:
         return self.__store[session_id]
 
     def embed(self, text: str) -> List[float]:
-        return self.__embedding_model.embed_query(text)
+        try:
+            return self.__embedding_model.embed_query(text)
+        except Exception as e:
+            logging.error(f"Error embedding text: {e}")
+            return []
 
     def complete_chat(self, content: str) -> str:
-        response = self.__with_message_history.invoke(
-            [HumanMessage(content=content)],
-            config=self.__config,
-        )
+        try:
+            response = self.__with_message_history.invoke(
+                [HumanMessage(content=content)],
+                config=self.__config,
+            )
+            return response.content
 
-        return response.content
+        except Exception as e:
+            logging.error(f"Error completing chat: {e}")
+            return ""
