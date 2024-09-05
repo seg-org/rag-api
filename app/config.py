@@ -7,7 +7,7 @@ load_dotenv()
 
 class AppConfig:
     env = os.getenv("APP_ENV")
-    port = os.getenv("APP_PORT")
+    port = int(os.getenv("APP_PORT"))
 
 
 class LangchainConfig:
