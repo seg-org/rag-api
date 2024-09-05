@@ -1,3 +1,6 @@
+pull-latest:
+	docker pull --platform linux/x86_64 ghcr.io/seg-org/rag-bot:latest
+
 dev:
 	python app/main.py
 

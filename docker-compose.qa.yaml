@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  rag-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rag-api
+    restart: unless-stopped
+    environment:
+      - APP_ENV=production
+      - APP_PORT=3000
+      - DB_URL=postgres://root:1234@db:5432/db
+      - MSG_EXPIRY_SEC=604800 # 1 week
+      - MAX_EMBED_DIST=0.7
+      - ENABLE_PROMPT_CONFIG=true
+      - LANGCHAIN_TRACING_V2=true
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    ports:
+      - "3000:3000"
+
+  rag-bot:
+    image: ghcr.io/seg-org/rag-bot:latest
+    container_name: rag-bot
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - API_URL=${API_URL}
+      - API_KEY=${API_KEY}
+      - BOT_TOKEN=${BOT_TOKEN}
+      - BOT_CLIENT_ID=${BOT_CLIENT_ID}
+      - GUILD_ID=${GUILD_ID}
+
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: db
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: "1234"
+      POSTGRES_DB: db
+
+volumes:
+  postgres:
