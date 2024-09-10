@@ -16,7 +16,8 @@ class LangchainConfig:
 
 
 class DbConfig:
-    url = os.getenv("DB_URL")
+    host = os.getenv("DB_HOST")
+    port = os.getenv("DB_PORT")
 
 
 class Config:

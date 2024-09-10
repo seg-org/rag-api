@@ -1,17 +1,17 @@
 version: "3.9"
 
 services:
-  rag-bot:
-    image: ghcr.io/seg-org/rag-bot:latest
-    container_name: rag-bot
-    restart: unless-stopped
-    environment:
-      - NODE_ENV=production
-      - API_URL=${API_URL}
-      - API_KEY=${API_KEY}
-      - BOT_TOKEN=${BOT_TOKEN}
-      - BOT_CLIENT_ID=${BOT_CLIENT_ID}
-      - GUILD_ID=${GUILD_ID}
+  # rag-bot:
+  #   image: ghcr.io/seg-org/rag-bot:latest
+  #   container_name: rag-bot
+  #   restart: unless-stopped
+  #   environment:
+  #     - NODE_ENV=production
+  #     - API_URL=${API_URL}
+  #     - API_KEY=${API_KEY}
+  #     - BOT_TOKEN=${BOT_TOKEN}
+  #     - BOT_CLIENT_ID=${BOT_CLIENT_ID}
+  #     - GUILD_ID=${GUILD_ID}
 
   db:
     image: pgvector/pgvector:pg16
@@ -26,5 +26,18 @@ services:
       POSTGRES_PASSWORD: "1234"
       POSTGRES_DB: db
 
+  chroma:
+    image: chromadb/chroma:latest
+    container_name: chroma-db
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma-data:/data
+    environment:
+      CHROMA_API_BIND: "0.0.0.0"  # Bind the API to all available IPs
+      CHROMA_SERVER_HOST: "0.0.0.0"  # Bind the Chroma server to all available IPs
+      CHROMA_PORT: "8000"
+
 volumes:
   postgres:
+  chroma-data:
