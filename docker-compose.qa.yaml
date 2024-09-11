@@ -10,13 +10,13 @@ services:
     environment:
       - APP_ENV=production
       - APP_PORT=3000
-      - DB_URL=postgres://root:1234@db:5432/db
-      - MSG_EXPIRY_SEC=604800 # 1 week
-      - MAX_EMBED_DIST=0.7
-      - ENABLE_PROMPT_CONFIG=true
+      - DB_HOST=localhost
+      - DB_PORT=8000
+      - ENABLE_PROMPT_TONE=false
       - LANGCHAIN_TRACING_V2=true
       - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
     ports:
       - "3000:3000"
 
@@ -32,18 +32,18 @@ services:
       - BOT_CLIENT_ID=${BOT_CLIENT_ID}
       - GUILD_ID=${GUILD_ID}
 
-  db:
-    image: pgvector/pgvector:pg16
-    container_name: db
-    restart: always
+  chroma:
+    image: chromadb/chroma:latest
+    container_name: chroma-db
+    restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "8000:8000"
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - chroma-data:/data
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: "1234"
-      POSTGRES_DB: db
+      CHROMA_API_BIND: "0.0.0.0"  # Bind the API to all available IPs
+      CHROMA_SERVER_HOST: "0.0.0.0"  # Bind the Chroma server to all available IPs
+      CHROMA_PORT: "8000"
 
 volumes:
-  postgres:
+  chroma-data:

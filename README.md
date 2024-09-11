@@ -39,8 +39,11 @@ OPENAI_API_KEY=
 
 # go to https://smith.langchain.com and create an account + api key
 LANGCHAIN_API_KEY=
+
+# go to https://tavily.com and create an account + api key (for internet searches when there's no relevant data in rag)
+TAVILY_API_KEY=
 ```
-3. Copy `prompt_config.example.json` in `./src/config` and paste it in the same directory as `prompt_config.json` and fill in the desired base prompt (what tone should the bot respond to your messages) or keep it as is.
+3. Copy `prompt_tone.example.json` in `./app/config` and paste it in the same directory as `prompt_tone.json` and fill in the desired base prompt (what tone should the bot respond to your messages) or keep it as is.
 
 ### Running
 
