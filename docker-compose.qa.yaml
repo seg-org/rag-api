@@ -12,6 +12,7 @@ services:
       - APP_PORT=3000
       - DB_HOST=localhost
       - DB_PORT=8000
+      - API_KEY=${API_KEY}
       - ENABLE_PROMPT_TONE=false
       - LANGCHAIN_TRACING_V2=true
       - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
