@@ -1,14 +1,13 @@
 from config import config
 from fastapi import HTTPException, Request
-from starlette.middleware.base import BaseHTTPMiddleware
 
 
-class APIKeyMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        api_key = request.headers.get("Authorization")
+def verify_api_key(request: Request):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
+        raise HTTPException(status_code=401, detail="Missing Authorization header")
 
-        if api_key != config.api_key:
-            raise HTTPException(status_code=401, detail="Invalid or missing API key")
+    api_key = auth_header.replace("Bearer ", "")
 
-        response = await call_next(request)
-        return response
+    if api_key != config.app.api_key:
+        raise HTTPException(status_code=401, detail="Invalid or missing API key")

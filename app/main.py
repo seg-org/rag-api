@@ -1,14 +1,14 @@
 import uvicorn
 from config import config
 from db import DB
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, Depends, FastAPI
 from llm import LLM
 from logger import logger
-from middleware import APIKeyMiddleware
+from middleware import verify_api_key
 from models import AddTextDocumentRequest, AddWebDocumentRequest
 
 app = FastAPI()
-router = APIRouter(prefix="/api/v1")
+router = APIRouter(prefix="/api/v1", dependencies=[Depends(verify_api_key)])
 db = DB(log=logger)
 llm = LLM(retriever=db.retriever, log=logger)
 
@@ -49,7 +49,6 @@ async def complete_chat(text: str = None):
     return {"reply": reply}
 
 
-app.add_middleware(APIKeyMiddleware)
 app.include_router(router)
 
 if __name__ == "__main__":
