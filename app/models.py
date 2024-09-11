@@ -3,5 +3,9 @@ from typing import List
 from pydantic import BaseModel
 
 
-class AddTextRequest(BaseModel):
+class AddTextDocumentRequest(BaseModel):
     text: str
+
+
+class AddWebDocumentRequest(BaseModel):
+    url: str

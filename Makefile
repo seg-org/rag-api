@@ -5,6 +5,6 @@ dev:
 	cd app && python main.py
 
 watch:
-	cd app && uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+	cd app && uvicorn main:app --host 0.0.0.0 --port 3000 --reload
 
 # pip install <package_name> && pip freeze > requirements.txt
