@@ -1,6 +1,7 @@
 import os
 
 from dotenv import load_dotenv
+from prompt_tone import prompt_tone
 
 load_dotenv()
 
@@ -19,6 +20,7 @@ class Config:
     app = AppConfig()
     db = DbConfig()
     enable_prompt_tone = os.getenv("ENABLE_PROMPT_TONE")
+    prompt_tone = prompt_tone
 
 
 config = Config()
