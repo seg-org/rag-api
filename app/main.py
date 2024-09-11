@@ -4,6 +4,7 @@ from db import DB
 from fastapi import APIRouter, FastAPI
 from llm import LLM
 from logger import logger
+from middleware import APIKeyMiddleware
 from models import AddTextDocumentRequest, AddWebDocumentRequest
 
 app = FastAPI()
@@ -48,6 +49,7 @@ async def complete_chat(text: str = None):
     return {"reply": reply}
 
 
+app.add_middleware(APIKeyMiddleware)
 app.include_router(router)
 
 if __name__ == "__main__":
