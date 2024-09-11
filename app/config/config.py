@@ -1,7 +1,8 @@
 import os
 
 from dotenv import load_dotenv
-from prompt_tone import prompt_tone
+
+from .prompt_tone import prompt_tone
 
 load_dotenv()
 

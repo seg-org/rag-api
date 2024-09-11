@@ -1,7 +1,5 @@
 import json
-import os
 from pathlib import Path
-from typing import Dict, TypedDict
 
 
 class PromptTone:
@@ -15,9 +13,10 @@ def read_json_file(file_path: Path) -> PromptTone:
     return data
 
 
-directory = Path(".")
+directory = Path("./config")
 file_name = "prompt_tone.json"
 
 file_path = directory / file_name
 
-prompt_tone = read_json_file(file_path)
+prompt_tone_conf = read_json_file(file_path)
+prompt_tone = f"{prompt_tone_conf["prompt"]}\n {"\n".join(prompt_tone_conf["rules"])}"

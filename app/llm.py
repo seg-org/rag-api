@@ -1,5 +1,6 @@
 import logging
 
+from config import config
 from langchain.tools.retriever import create_retriever_tool
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_core.messages import AIMessage, HumanMessage
@@ -11,6 +12,7 @@ from langgraph.prebuilt import create_react_agent
 
 class LLM:
     __config = {"configurable": {"thread_id": "main"}}
+    __tone_model = ChatOpenAI(model="gpt-3.5-turbo")
 
     def __init__(self, retriever: BaseRetriever):
         memory = MemorySaver()
@@ -33,9 +35,8 @@ class LLM:
 
     def complete_chat(self, query: str) -> str:
         try:
-            queries = [query]
             responses = self.agent_executor.stream(
-                {"messages": [HumanMessage(content=queries)]}, config=self.__config
+                {"messages": [HumanMessage(content=query)]}, config=self.__config
             )
             last_message: AIMessage
             for s in responses:
@@ -46,7 +47,18 @@ class LLM:
                     print(s["tools"]["messages"])
                 print("----")
 
-            return last_message.content
+            original_reply: str = last_message.content
+
+            if not config.enable_prompt_tone:
+                return original_reply
+
+            toned_reply = self.__tone_model.invoke(
+                [
+                    AIMessage(content=config.prompt_tone),
+                    HumanMessage(content=original_reply),
+                ]
+            )
+            return toned_reply.content
 
         except Exception as e:
             logging.error(f"Error completing chat: {e}")
