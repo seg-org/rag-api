@@ -33,8 +33,9 @@ class LLM:
 
     def complete_chat(self, query: str) -> str:
         try:
+            queries = [query]
             responses = self.agent_executor.stream(
-                {"messages": [HumanMessage(content=query)]}, config=self.__config
+                {"messages": [HumanMessage(content=queries)]}, config=self.__config
             )
             last_message: AIMessage
             for s in responses:
