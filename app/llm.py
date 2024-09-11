@@ -1,4 +1,4 @@
-import logging
+from logging import Logger
 
 from config import config
 from langchain.tools.retriever import create_retriever_tool
@@ -14,7 +14,8 @@ class LLM:
     __config = {"configurable": {"thread_id": "main"}}
     __tone_model = ChatOpenAI(model="gpt-3.5-turbo")
 
-    def __init__(self, retriever: BaseRetriever):
+    def __init__(self, retriever: BaseRetriever, log: Logger):
+        self.log = log
         memory = MemorySaver()
         chat_completion_model = ChatOpenAI(model="gpt-3.5-turbo")
 
@@ -61,5 +62,5 @@ class LLM:
             return toned_reply.content
 
         except Exception as e:
-            logging.error(f"Error completing chat: {e}")
+            self.log.error(f"Error completing chat: {e}")
             return ""

@@ -20,7 +20,7 @@ class DbConfig:
 class Config:
     app = AppConfig()
     db = DbConfig()
-    enable_prompt_tone = os.getenv("ENABLE_PROMPT_TONE")
+    enable_prompt_tone = os.getenv("ENABLE_PROMPT_TONE") == "true"
     prompt_tone = prompt_tone
 
 
