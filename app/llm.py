@@ -1,67 +1,45 @@
 import logging
-from operator import itemgetter
-from typing import List
 
-from langchain_core.chat_history import (
-    BaseChatMessageHistory,
-    InMemoryChatMessageHistory,
-)
-from langchain_core.messages import HumanMessage, trim_messages
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import RunnablePassthrough
-from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain.tools.retriever import create_retriever_tool
+from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.retrievers import BaseRetriever
+from langchain_openai import ChatOpenAI
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.prebuilt import create_react_agent
 
 
 class LLM:
-    __store = {}
-    __config = {"configurable": {"session_id": "main"}}
+    __config = {"configurable": {"thread_id": "main"}}
 
-    def __init__(self):
-        prompt = ChatPromptTemplate.from_messages(
-            [
-                (
-                    "system",
-                    "You are a helpful assistant. Answer all questions to the best of your ability.",
-                ),
-                MessagesPlaceholder(variable_name="messages"),
-            ]
-        )
-
+    def __init__(self, retriever: BaseRetriever):
+        memory = MemorySaver()
         chat_completion_model = ChatOpenAI(model="gpt-3.5-turbo")
-        trimmer = trim_messages(
-            max_tokens=65,
-            strategy="last",
-            token_counter=chat_completion_model,
-            include_system=True,
-            allow_partial=False,
-            start_on="human",
+
+        tool = create_retriever_tool(
+            retriever,
+            "blog_post_retriever",
+            "Searches and returns excerpts from the Autonomous Agents blog post.",
+        )
+        tools = [tool]
+        self.agent_executor = create_react_agent(
+            chat_completion_model, tools, checkpointer=memory
         )
 
-        chain = (
-            RunnablePassthrough.assign(messages=itemgetter("messages") | trimmer)
-            | prompt
-            | chat_completion_model
-        )
-
-        self.__with_message_history = RunnableWithMessageHistory(
-            chain,
-            self.__get_session_history,
-            input_messages_key="messages",
-        )
-
-    def __get_session_history(self, session_id: str) -> BaseChatMessageHistory:
-        if session_id not in self.__store:
-            self.__store[session_id] = InMemoryChatMessageHistory()
-        return self.__store[session_id]
-
-    def complete_chat(self, content: str) -> str:
+    def complete_chat(self, query: str) -> str:
         try:
-            response = self.__with_message_history.invoke(
-                {"messages": [HumanMessage(content=content)]},
-                config=self.__config,
+            responses = self.agent_executor.stream(
+                {"messages": [HumanMessage(content=query)]}, config=self.__config
             )
-            return response.content
+            last_message: AIMessage
+            for s in responses:
+                if "agent" in s:
+                    print(s["agent"]["messages"])
+                    last_message = s["agent"]["messages"][0]
+                elif "tools" in s:
+                    print(s["tools"]["messages"])
+                print("----")
+
+            return last_message.content
 
         except Exception as e:
             logging.error(f"Error completing chat: {e}")

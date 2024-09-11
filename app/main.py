@@ -8,8 +8,8 @@ from models import AddTextDocumentRequest, AddWebDocumentRequest
 
 app = FastAPI()
 router = APIRouter(prefix="/api/v1")
-llm = LLM()
 db = DB(log=logger)
+llm = LLM(retriever=db.retriever)
 
 
 @router.get("/")

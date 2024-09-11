@@ -51,6 +51,8 @@ langchain-core==0.2.38
 langchain-nomic==0.1.2
 langchain-openai==0.1.23
 langchain-text-splitters==0.2.4
+langgraph==0.2.19
+langgraph-checkpoint==1.0.9
 langsmith==0.1.114
 loguru==0.7.2
 markdown-it-py==3.0.0
