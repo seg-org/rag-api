@@ -38,7 +38,7 @@ class DB:
             return "Web document added successfully: " + url
         except Exception as e:
             self.log.error(f"Error adding web document: {e}")
-            return ""
+            return e.__str__()
 
     def add_text(self, text: str):
         try:
@@ -47,7 +47,7 @@ class DB:
             return "Text added successfully: " + text
         except Exception as e:
             self.log.error(f"Error adding text: {e}")
-            return ""
+            return e.__str__()
 
     def get_all(self):
         try:
@@ -55,7 +55,7 @@ class DB:
             return results
         except Exception as e:
             self.log.error(f"Error getting all texts: {e}")
-            return ""
+            return e.__str__()
 
     def get_relevant_text(self, text: str):
         try:
@@ -63,3 +63,4 @@ class DB:
             return [r.page_content for r in results]
         except Exception as e:
             self.log.error(f"Error getting relevant text: {e}")
+            return e.__str__()
