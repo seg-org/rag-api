@@ -6,7 +6,7 @@ from langchain_core.chat_history import (
     BaseChatMessageHistory,
     InMemoryChatMessageHistory,
 )
-from langchain_core.messages import HumanMessage, SystemMessage, trim_messages
+from langchain_core.messages import HumanMessage, trim_messages
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.runnables.history import RunnableWithMessageHistory
@@ -14,7 +14,6 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 
 class LLM:
-    __embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
     __store = {}
     __config = {"configurable": {"session_id": "main"}}
 
@@ -55,13 +54,6 @@ class LLM:
         if session_id not in self.__store:
             self.__store[session_id] = InMemoryChatMessageHistory()
         return self.__store[session_id]
-
-    def embed(self, text: str) -> List[float]:
-        try:
-            return self.__embedding_model.embed_query(text)
-        except Exception as e:
-            logging.error(f"Error embedding text: {e}")
-            return []
 
     def complete_chat(self, content: str) -> str:
         try:
