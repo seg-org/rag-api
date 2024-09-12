@@ -18,8 +18,15 @@ async def root():
     return {"message": "Hello World"}
 
 
+@router.post("/guild/{guild_id}/toggle-web-search")
+async def toggle_web_search(guild_id: str = None):
+    reply = llm.toggle_web_search(guild_id)
+
+    return {"reply": reply}
+
+
 @router.get("/guild/{guild_id}/documents")
-async def docs_get_all(guild_id: int = None):
+async def docs_get_all(guild_id: str = None):
     reply = db.get_all_docs(guild_id)
 
     return {"reply": reply}

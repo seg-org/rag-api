@@ -18,7 +18,20 @@ class LLM:
         self.db = db
         self.log = log
         self.guild_memory_store: dict[str, MemorySaver] = {}
+        self.enable_web_search: dict[str, bool] = {}
         self.chat_completion_model = ChatOpenAI(model="gpt-3.5-turbo")
+
+    def toggle_web_search(self, guild_id: str):
+        if guild_id not in self.enable_web_search:
+            self.enable_web_search[guild_id] = True
+
+        self.enable_web_search[guild_id] = not self.enable_web_search[guild_id]
+        return f"Web search toggled to {self.enable_web_search[guild_id]}"
+
+    def get_enable_web_search(self, guild_id: str):
+        if guild_id not in self.enable_web_search:
+            self.enable_web_search[guild_id] = True
+        return self.enable_web_search[guild_id]
 
     def get_memory_for_guild(self, guild_id):
         if guild_id not in self.guild_memory_store:
@@ -38,15 +51,18 @@ class LLM:
                 description="Search information from the internet",
             )
 
-            tools = [docs_tool, web_search_tool]
+            tools = [docs_tool]
+            self.log.info(f"Web search enabled: {self.get_enable_web_search(guild_id)}")
+            if self.get_enable_web_search(guild_id):
+                tools.append(web_search_tool)
 
-            self.agent_executor = create_react_agent(
+            agent_executor = create_react_agent(
                 self.chat_completion_model,
                 tools,
                 checkpointer=self.get_memory_for_guild(guild_id),
             )
 
-            responses = self.agent_executor.stream(
+            responses = agent_executor.stream(
                 {"messages": [HumanMessage(content=query)]}, config=self.__config
             )
             last_message: AIMessage
