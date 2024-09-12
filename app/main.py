@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, FastAPI
 from llm import LLM
 from logger import logger
 from middleware import verify_api_key
-from models import AddTextDocumentRequest, AddWebDocumentRequest
+from models import AddTextDocumentRequest, AddWebDocumentRequest, RecordMessageRequest
 
 app = FastAPI()
 router = APIRouter(prefix="/api/v1", dependencies=[Depends(verify_api_key)])
@@ -26,8 +26,8 @@ async def docs_get_all(guild_id: int = None):
 
 
 @router.post("/guild/{guild_id}/message")
-async def chat_record_message(guild_id: int = None):
-    reply = db.record_message(guild_id)
+async def chat_record_message(request: RecordMessageRequest, guild_id: int = None):
+    reply = db.record_message(request.message, guild_id)
 
     return {"reply": reply}
 
