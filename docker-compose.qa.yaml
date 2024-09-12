@@ -31,7 +31,6 @@ services:
       - API_KEY=${API_KEY}
       - BOT_TOKEN=${BOT_TOKEN}
       - BOT_CLIENT_ID=${BOT_CLIENT_ID}
-      - GUILD_ID=${GUILD_ID}
 
   chroma:
     image: chromadb/chroma:latest

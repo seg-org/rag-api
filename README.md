@@ -32,7 +32,6 @@ pip install -r requirements.txt
 # for these, see README.md in the bot repo
 BOT_TOKEN=
 BOT_CLIENT_ID=
-GUILD_ID=
 
 # go to https://platform.openai.com/account/api-keys (you need to top-up some $$ first)
 OPENAI_API_KEY=
