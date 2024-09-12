@@ -10,7 +10,7 @@ from models import AddTextDocumentRequest, AddWebDocumentRequest
 app = FastAPI()
 router = APIRouter(prefix="/api/v1", dependencies=[Depends(verify_api_key)])
 db = DB(log=logger)
-llm = LLM(log=logger)
+llm = LLM(db=db, log=logger)
 
 
 @router.get("/")

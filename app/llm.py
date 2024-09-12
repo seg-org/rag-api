@@ -1,20 +1,21 @@
 from logging import Logger
 
 from config import config
+from db import DB
 from langchain.agents import Tool
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
-from main import db
 
 
 class LLM:
     __config = {"configurable": {"thread_id": "main"}}
     __tone_model = ChatOpenAI(model="gpt-3.5-turbo")
 
-    def __init__(self, log: Logger):
+    def __init__(self, db: DB, log: Logger):
+        self.db = db
         self.log = log
         self.memory = MemorySaver()
         self.chat_completion_model = ChatOpenAI(model="gpt-3.5-turbo")
@@ -23,13 +24,13 @@ class LLM:
         try:
             docs_tool = Tool(
                 name="docs_tool",
-                func=lambda text: db.query_docs(text, guild_id),
+                func=lambda text: self.db.query_docs(text, guild_id),
                 description="Searches documents in the database that are relevant to query input.",
             )
 
             chat_tool = Tool(
                 name="docs_tool",
-                func=lambda text: db.query_chat(text, guild_id),
+                func=lambda text: self.db.query_chat(text, guild_id),
                 description="Searches chat messages in the Discord server that are relevant to query input.",
             )
 
