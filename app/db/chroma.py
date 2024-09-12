@@ -34,7 +34,6 @@ class DB:
     def record_message(self, text: str, guild_id: str):
         try:
             self.chat_store.add_texts(texts=[text], metadatas=[{"guild_id": guild_id}])
-            self.log.info("Message recorded to database:", text)
             return "Message recorded successfully: " + text
         except Exception as e:
             self.log.error(f"Error recording message: {e}")
@@ -54,7 +53,7 @@ class DB:
             doc_splits = text_splitter.split_documents(guilded_docs)
 
             self.docs_store.add_documents(documents=doc_splits)
-            self.log.info("Web document added to database:", url)
+
             return "Web document added successfully: " + url
         except Exception as e:
             self.log.error(f"Error adding web document: {e}")
@@ -63,7 +62,6 @@ class DB:
     def add_text(self, text: str, guild_id: str):
         try:
             self.docs_store.add_texts(texts=[text], metadatas=[{"guild_id": guild_id}])
-            self.log.info("Text added to database:", text)
             return "Text added successfully: " + text
         except Exception as e:
             self.log.error(f"Error adding text: {e}")
