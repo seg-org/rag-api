@@ -5,12 +5,12 @@ from fastapi import APIRouter, Depends, FastAPI
 from llm import LLM
 from logger import logger
 from middleware import verify_api_key
-from models import AddTextDocumentRequest, AddWebDocumentRequest
+from models import AddTextDocumentRequest, AddWebDocumentRequest, RecordMessageRequest
 
 app = FastAPI()
 router = APIRouter(prefix="/api/v1", dependencies=[Depends(verify_api_key)])
 db = DB(log=logger)
-llm = LLM(retriever=db.retriever, log=logger)
+llm = LLM(db=db, log=logger)
 
 
 @router.get("/")
@@ -18,33 +18,37 @@ async def root():
     return {"message": "Hello World"}
 
 
-@router.get("/documents")
-async def docs_get_all():
-    return db.get_all()
-
-
-@router.get("/documents/relevant")
-async def docs_get_relevant(text: str = None):
-    return db.get_relevant_text(text)
-
-
-@router.post("/documents/text")
-async def docs_add_text(request: AddTextDocumentRequest):
-    reply = db.add_text(request.text)
+@router.post("/guild/{guild_id}/toggle-web-search")
+async def toggle_web_search(guild_id: str = None):
+    reply = llm.toggle_web_search(guild_id)
 
     return {"reply": reply}
 
 
-@router.post("/documents/web")
-async def docs_add_web(request: AddWebDocumentRequest):
-    reply = db.add_web(request.url)
+@router.get("/guild/{guild_id}/documents")
+async def docs_get_all(guild_id: str = None):
+    reply = db.get_all_docs(guild_id)
 
     return {"reply": reply}
 
 
-@router.get("/complete-chat")
-async def complete_chat(text: str = None):
-    reply = llm.complete_chat(text)
+@router.post("/guild/{guild_id}/documents/text")
+async def docs_add_text(request: AddTextDocumentRequest, guild_id: str = None):
+    reply = db.add_text(request.text, guild_id)
+
+    return {"reply": reply}
+
+
+@router.post("/guild/{guild_id}/documents/web")
+async def docs_add_web(request: AddWebDocumentRequest, guild_id: str = None):
+    reply = db.add_web(request.url, guild_id)
+
+    return {"reply": reply}
+
+
+@router.get("/guild/{guild_id}/complete-chat")
+async def complete_chat(text: str = None, guild_id: str = None):
+    reply = llm.complete_chat(text, guild_id)
 
     return {"reply": reply}
 
