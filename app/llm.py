@@ -33,18 +33,12 @@ class LLM:
                 "Searches documents in the database that are relevant to query input.",
             )
 
-            chat_tool = create_retriever_tool(
-                self.db.get_chat_retriever(guild_id),
-                "chat_retriever",
-                "Searches chat messages in the Discord server that are relevant to query input.",
-            )
-
             web_search_tool = TavilySearchResults(
                 name="web_search_tool",
                 description="Search information from the internet",
             )
 
-            tools = [docs_tool, chat_tool, web_search_tool]
+            tools = [docs_tool, web_search_tool]
 
             self.agent_executor = create_react_agent(
                 self.chat_completion_model,

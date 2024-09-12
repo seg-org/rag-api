@@ -20,14 +20,7 @@ async def root():
 
 @router.get("/guild/{guild_id}/documents")
 async def docs_get_all(guild_id: int = None):
-    reply = db.get_all(guild_id)
-
-    return {"reply": reply}
-
-
-@router.post("/guild/{guild_id}/message")
-async def chat_record_message(request: RecordMessageRequest, guild_id: int = None):
-    reply = db.record_message(request.message, guild_id)
+    reply = db.get_all_docs(guild_id)
 
     return {"reply": reply}
 

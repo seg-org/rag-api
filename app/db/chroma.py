@@ -23,21 +23,6 @@ class DB:
                 model="nomic-embed-text-v1.5", inference_mode="local"
             ),
         )
-        self.chat_store = Chroma(
-            collection_name="chat",
-            client_settings=settings,
-            embedding_function=NomicEmbeddings(
-                model="nomic-embed-text-v1.5", inference_mode="local"
-            ),
-        )
-
-    def record_message(self, text: str, guild_id: str):
-        try:
-            self.chat_store.add_texts(texts=[text], metadatas=[{"guild_id": guild_id}])
-            return "Message recorded successfully: " + text
-        except Exception as e:
-            self.log.error(f"Error recording message: {e}")
-            return e.__str__()
 
     def add_web(self, url: str, guild_id: str):
         try:
@@ -72,12 +57,7 @@ class DB:
             search_kwargs={"filter": {"guild_id": int(guild_id)}}
         )
 
-    def get_chat_retriever(self, guild_id: str):
-        return self.chat_store.as_retriever(
-            search_kwargs={"filter": {"guild_id": int(guild_id)}}
-        )
-
-    def get_all(self, guild_id: str):
+    def get_all_docs(self, guild_id: str):
         try:
             results = self.docs_store.get(where={"guild_id": guild_id})
             return results
