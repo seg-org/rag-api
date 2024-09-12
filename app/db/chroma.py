@@ -16,51 +16,83 @@ class DB:
             chroma_server_host=config.db.host,
             chroma_server_http_port=config.db.port,
         )
-        self.vectorstore = Chroma(
-            collection_name="test",
+        self.docs_store = Chroma(
+            collection_name="docs",
             client_settings=settings,
             embedding_function=NomicEmbeddings(
                 model="nomic-embed-text-v1.5", inference_mode="local"
             ),
         )
-        self.retriever = self.vectorstore.as_retriever()
+        self.chat_store = Chroma(
+            collection_name="chat",
+            client_settings=settings,
+            embedding_function=NomicEmbeddings(
+                model="nomic-embed-text-v1.5", inference_mode="local"
+            ),
+        )
 
-    def add_web(self, url: str):
+    def record_message(self, text: str, guild_id: str):
+        try:
+            self.chat_store.add_texts(texts=[text], metadatas=[{"guild_id": guild_id}])
+            self.log.info("Message recorded to database:", text)
+            return "Message recorded successfully: " + text
+        except Exception as e:
+            self.log.error(f"Error recording message: {e}")
+            return e.__str__()
+
+    def add_web(self, url: str, guild_id: str):
         try:
             docs_list = WebBaseLoader(url).load()
             text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
                 chunk_size=250, chunk_overlap=0
             )
-            doc_splits = text_splitter.split_documents(docs_list)
+            guilded_docs = []
+            for d in docs_list:
+                d.metadata["guild_id"] = guild_id
+                guilded_docs.append(d)
 
-            self.vectorstore.add_documents(documents=doc_splits)
+            doc_splits = text_splitter.split_documents(guilded_docs)
+
+            self.docs_store.add_documents(documents=doc_splits)
             self.log.info("Web document added to database:", url)
             return "Web document added successfully: " + url
         except Exception as e:
             self.log.error(f"Error adding web document: {e}")
             return e.__str__()
 
-    def add_text(self, text: str):
+    def add_text(self, text: str, guild_id: str):
         try:
-            self.vectorstore.add_texts(texts=[text])
+            self.docs_store.add_texts(texts=[text], metadatas=[{"guild_id": guild_id}])
             self.log.info("Text added to database:", text)
             return "Text added successfully: " + text
         except Exception as e:
             self.log.error(f"Error adding text: {e}")
             return e.__str__()
 
-    def get_all(self):
+    def query_docs(self, query: str, guild_id: str):
         try:
-            results = self.vectorstore.get()
+            results = self.docs_store.similarity_search(
+                query=[query], where={"guild_id": guild_id}
+            )
+            return results
+        except Exception as e:
+            self.log.error(f"Error querying documents: {e}")
+            return e.__str__()
+
+    def query_chat(self, query: str, guild_id: str):
+        try:
+            results = self.chat_store.similarity_search(
+                query=[query], where={"guild_id": guild_id}
+            )
+            return results
+        except Exception as e:
+            self.log.error(f"Error querying chat: {e}")
+            return e.__str__()
+
+    def get_all(self, guild_id: str):
+        try:
+            results = self.docs_store.get(where={"guild_id": guild_id})
             return results
         except Exception as e:
             self.log.error(f"Error getting all texts: {e}")
-            return e.__str__()
-
-    def get_relevant_text(self, text: str):
-        try:
-            results = self.retriever.invoke(text)
-            return [r.page_content for r in results]
-        except Exception as e:
-            self.log.error(f"Error getting relevant text: {e}")
             return e.__str__()
