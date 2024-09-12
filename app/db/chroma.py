@@ -69,12 +69,12 @@ class DB:
 
     def get_docs_retriever(self, guild_id: str):
         return self.docs_store.as_retriever(
-            search_kwargs={"filter": {"guild_id": guild_id}}
+            search_kwargs={"filter": {"guild_id": int(guild_id)}}
         )
 
     def get_chat_retriever(self, guild_id: str):
         return self.chat_store.as_retriever(
-            search_kwargs={"filter": {"guild_id": guild_id}}
+            search_kwargs={"filter": {"guild_id": int(guild_id)}}
         )
 
     def get_all(self, guild_id: str):
