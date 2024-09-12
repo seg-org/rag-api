@@ -67,25 +67,15 @@ class DB:
             self.log.error(f"Error adding text: {e}")
             return e.__str__()
 
-    def query_docs(self, query: str, guild_id: str):
-        try:
-            results = self.docs_store.similarity_search(
-                query=[query], where={"guild_id": guild_id}
-            )
-            return results
-        except Exception as e:
-            self.log.error(f"Error querying documents: {e}")
-            return e.__str__()
+    def get_docs_retriever(self, guild_id: str):
+        return self.docs_store.as_retriever(
+            search_kwargs={"filter": {"guild_id": guild_id}}
+        )
 
-    def query_chat(self, query: str, guild_id: str):
-        try:
-            results = self.chat_store.similarity_search(
-                query=[query], where={"guild_id": guild_id}
-            )
-            return results
-        except Exception as e:
-            self.log.error(f"Error querying chat: {e}")
-            return e.__str__()
+    def get_chat_retriever(self, guild_id: str):
+        return self.chat_store.as_retriever(
+            search_kwargs={"filter": {"guild_id": guild_id}}
+        )
 
     def get_all(self, guild_id: str):
         try:
