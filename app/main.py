@@ -33,14 +33,14 @@ async def docs_get_all(guild_id: str = None):
 
 
 @router.post("/guild/{guild_id}/documents/text")
-async def docs_add_text(request: AddTextDocumentRequest, guild_id: int = None):
+async def docs_add_text(request: AddTextDocumentRequest, guild_id: str = None):
     reply = db.add_text(request.text, guild_id)
 
     return {"reply": reply}
 
 
 @router.post("/guild/{guild_id}/documents/web")
-async def docs_add_web(request: AddWebDocumentRequest, guild_id: int = None):
+async def docs_add_web(request: AddWebDocumentRequest, guild_id: str = None):
     reply = db.add_web(request.url, guild_id)
 
     return {"reply": reply}
