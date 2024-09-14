@@ -9,6 +9,9 @@ watch:
 	cd app && uvicorn main:app --host 0.0.0.0 --port 3000 --reload
 
 qa:
+	docker-compose -f docker-compose.qa.yaml up
+	
+qa-build:
 	docker-compose -f docker-compose.qa.yaml up --build
 
 # pip install <package_name> && pip freeze > requirements.txt
