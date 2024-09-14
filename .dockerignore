@@ -1,4 +1,6 @@
 .venv
+prompt_tone.json
+prompt_tone.example.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
