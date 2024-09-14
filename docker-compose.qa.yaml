@@ -2,9 +2,7 @@ version: "3.9"
 
 services:
   rag-api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/seg-org/rag-api:latest
     container_name: rag-api
     restart: unless-stopped
     environment:

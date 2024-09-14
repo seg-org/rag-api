@@ -1,5 +1,6 @@
 pull-latest:
 	docker pull --platform linux/x86_64 ghcr.io/seg-org/rag-bot:latest
+	docker pull --platform linux/x86_64 ghcr.io/seg-org/rag-api:latest
 
 dev:
 	cd app && python main.py
