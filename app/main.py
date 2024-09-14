@@ -56,4 +56,4 @@ async def complete_chat(text: str = None, guild_id: str = None):
 app.include_router(router)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=config.app.port)
+    uvicorn.run(app, host="0.0.0.0", port=config.app.port)
