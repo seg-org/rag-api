@@ -8,9 +8,9 @@ services:
     environment:
       - APP_ENV=production
       - APP_PORT=3000
+      - APP_API_KEY=1234
       - DB_HOST=chroma
       - DB_PORT=8000
-      - API_KEY=1234
       - ENABLE_PROMPT_TONE=false
       - LANGCHAIN_TRACING_V2=true
       - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
