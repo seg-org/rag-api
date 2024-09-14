@@ -10,12 +10,16 @@ services:
       - APP_PORT=3000
       - DB_HOST=chroma
       - DB_PORT=8000
-      - API_KEY=${API_KEY}
+      - API_KEY=1234
       - ENABLE_PROMPT_TONE=false
       - LANGCHAIN_TRACING_V2=true
       - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - TAVILY_API_KEY=${TAVILY_API_KEY}
+    networks:
+      - rag-bot
+    volumes:
+      - ./app/config/prompt_tone.json:/app/app/config/prompt_tone.json
     ports:
       - "3000:3000"
 
@@ -25,10 +29,12 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-      - API_URL=http://host.docker.internal:3000
-      - API_KEY=${API_KEY}
+      - API_URL=http://rag-api:3000
+      - API_KEY=1234
       - BOT_TOKEN=${BOT_TOKEN}
       - BOT_CLIENT_ID=${BOT_CLIENT_ID}
+    networks:
+      - rag-bot
 
   chroma:
     image: chromadb/chroma:latest
@@ -36,12 +42,18 @@ services:
     restart: unless-stopped
     ports:
       - "8000:8000"
-    volumes:
-      - chroma-data:/data
     environment:
       CHROMA_API_BIND: "0.0.0.0"  # Bind the API to all available IPs
       CHROMA_SERVER_HOST: "0.0.0.0"  # Bind the Chroma server to all available IPs
       CHROMA_PORT: "8000"
+    networks:
+      - rag-bot
+    volumes:
+      - chroma-data:/data
+
+networks:
+  rag-bot:
+    name: rag-bot
 
 volumes:
   chroma-data:
