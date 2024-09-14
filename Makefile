@@ -10,8 +10,11 @@ watch:
 
 qa:
 	docker-compose -f docker-compose.qa.yaml up
-	
+
 qa-build:
 	docker-compose -f docker-compose.qa.yaml up --build
+
+prod:
+	docker-compose -f docker-compose.prod.yaml up
 
 # pip install <package_name> && pip freeze > requirements.txt

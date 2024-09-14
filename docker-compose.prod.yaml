@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  rag-api:
+    image: ghcr.io/seg-org/rag-api:latest
+    container_name: rag-api
+    restart: unless-stopped
+    environment:
+      - APP_ENV=production
+      - APP_PORT=3000
+      - DB_HOST=chroma
+      - DB_PORT=8000
+      - API_KEY=${API_KEY}
+      - ENABLE_PROMPT_TONE=false
+      - LANGCHAIN_TRACING_V2=true
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
+    ports:
+      - "3000:3000"
+
+  rag-bot:
+    image: ghcr.io/seg-org/rag-bot:latest
+    container_name: rag-bot
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - API_URL=http://host.docker.internal:3000
+      - API_KEY=${API_KEY}
+      - BOT_TOKEN=${BOT_TOKEN}
+      - BOT_CLIENT_ID=${BOT_CLIENT_ID}
+
+  chroma:
+    image: chromadb/chroma:latest
+    container_name: chroma-db
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma-data:/data
+    environment:
+      CHROMA_API_BIND: "0.0.0.0"  # Bind the API to all available IPs
+      CHROMA_SERVER_HOST: "0.0.0.0"  # Bind the Chroma server to all available IPs
+      CHROMA_PORT: "8000"
+
+volumes:
+  chroma-data:
