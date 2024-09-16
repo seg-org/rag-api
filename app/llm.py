@@ -4,6 +4,8 @@ from config import config
 from db import DB
 from langchain.tools.retriever import create_retriever_tool
 from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_community.tools import WikipediaQueryRun, WolframAlphaQueryRun
+from langchain_community.utilities.wolfram_alpha import WolframAlphaAPIWrapper
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
@@ -46,23 +48,24 @@ class LLM:
                 "Searches documents in the database that are relevant to query input.",
             )
 
-            web_search_tool = TavilySearchResults(
-                name="web_search_tool",
-                description="Search information from the internet",
-            )
+        web_search_tool = TavilySearchResults(
+            name="web_search_tool", description="Search information from the internet"
+        )
 
-            tools = [docs_tool]
-            self.log.info(f"Web search enabled: {self.get_enable_web_search(guild_id)}")
-            if self.get_enable_web_search(guild_id):
-                tools.append(web_search_tool)
+        wolfram_alpha_tool = WolframAlphaQueryRun(
+            api_wrapper=WolframAlphaAPIWrapper()
+        )
 
-            agent_executor = create_react_agent(
-                self.chat_completion_model,
-                tools,
-                checkpointer=self.get_memory_for_guild(guild_id),
-            )
+        tools = [web_docs_tool, web_search_tool, wolfram_alpha_tool]
+        
+        tools = [web_docs_tool, web_search_tool]
+        self.agent_executor = create_react_agent(
+            chat_completion_model, tools, checkpointer=memory
+        )
 
-            responses = agent_executor.stream(
+    def complete_chat(self, query: str) -> str:
+        try:
+            responses = self.agent_executor.stream(
                 {"messages": [HumanMessage(content=query)]}, config=self.__config
             )
             last_message: AIMessage

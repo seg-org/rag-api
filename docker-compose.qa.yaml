@@ -18,6 +18,7 @@ services:
       - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - TAVILY_API_KEY=${TAVILY_API_KEY}
+      - WOLFRAM_ALPHA_APPID=${WOLFRAM_ALPHA_APPID}
     ports:
       - "3000:3000"
 
@@ -41,8 +42,8 @@ services:
     volumes:
       - chroma-data:/data
     environment:
-      CHROMA_API_BIND: "0.0.0.0"  # Bind the API to all available IPs
-      CHROMA_SERVER_HOST: "0.0.0.0"  # Bind the Chroma server to all available IPs
+      CHROMA_API_BIND: "0.0.0.0" # Bind the API to all available IPs
+      CHROMA_SERVER_HOST: "0.0.0.0" # Bind the Chroma server to all available IPs
       CHROMA_PORT: "8000"
 
 volumes:
