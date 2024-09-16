@@ -16,6 +16,9 @@ Making a bot that can **leverage documents** with **RAG** to generate relevant r
 - /add-text: Adds text to the vector database knowledge base.
 - /add-web: Adds web page (you input the url, the API will load data from that page) to the vector database knowledge base.
 - /toggle-web-search: Toggles whether the bot should search the web for data when it can't find any in the vector database.
+- /add-borrow-money: Adds debt [Borrower, Lender, Amount] to the vector database knowledge base.
+- /add-split-bill: Split bill [Payer, Participants, Amount] into multiple debt [Borrower, Lender, Amount] to the vector database knowledge base.
+- /ask-debt-summary: Ask debt summary of a person.
 
 Note: the requests the bot makes to the API have guild IDs in the url params in order to keep track of the loaded documents for each guild **separately**.
 
