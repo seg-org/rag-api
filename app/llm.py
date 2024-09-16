@@ -9,6 +9,7 @@ from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 
+
 class LLM:
     __config = {"configurable": {"thread_id": "main"}}
     __tone_model = ChatOpenAI(model="gpt-3.5-turbo")
@@ -43,9 +44,10 @@ class LLM:
             if useDebtSum:
                 person = query.title()
                 query = f"""
-                            List all transactions with "owes",
+                            List all transactions with "owes".
                             List all of them, don't limit the number of transactions.
                             Don't include any currency symbols, only numbers.
+                            Format it as "number|borrower|owes|lender|amount".
                         """
 
             docs_tool = create_retriever_tool(
@@ -91,25 +93,28 @@ class LLM:
                 d = {}
                 for t in transactions:
                     try:
-                        number, borrower, owes, lender, amount = t.split(" ")
+                        number, borrower, owes, lender, amount = t.split("|")
                     except Exception as e:
                         self.log.error(f"Error splitting transaction: {e}")
                         self.log.info(f"Transaction: {t}")
                         continue
-                    if borrower.title() != person.title() and lender.title() != person.title():
+                    if (
+                        borrower.title() != person.title()
+                        and lender.title() != person.title()
+                    ):
                         continue
-                    other = ''
+                    other = ""
                     if borrower.title() == person.title():
                         amount = -float(amount)
                         other = lender.title()
                     else:
                         amount = float(amount)
                         other = borrower.title()
-                    
+
                     person = person.title()
                     if other not in d:
                         d[other] = 0
-                    
+
                     d[other] += amount
 
                 borrowed_list = []
