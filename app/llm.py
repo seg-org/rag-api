@@ -9,10 +9,10 @@ from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 
-
 class LLM:
     __config = {"configurable": {"thread_id": "main"}}
     __tone_model = ChatOpenAI(model="gpt-3.5-turbo")
+    __debt_model = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
 
     def __init__(self, db: DB, log: Logger):
         self.db = db
@@ -38,8 +38,16 @@ class LLM:
             self.guild_memory_store[guild_id] = MemorySaver()
         return self.guild_memory_store[guild_id]
 
-    def complete_chat(self, query: str, guild_id: str) -> str:
+    def complete_chat(self, query: str, guild_id: str, useDebtSum: bool = False) -> str:
         try:
+            if useDebtSum:
+                person = query.title()
+                query = f"""
+                            List all transactions with "owes",
+                            List all of them, don't limit the number of transactions.
+                            Don't include any currency symbols, only numbers.
+                        """
+
             docs_tool = create_retriever_tool(
                 self.db.get_docs_retriever(guild_id),
                 "docs_retriever",
@@ -75,6 +83,47 @@ class LLM:
                 print("----")
 
             original_reply: str = last_message.content
+
+            self.log.info(f"Original reply: {original_reply}")
+
+            if useDebtSum and original_reply.strip() != "NO TRANSACTIONS FOUND":
+                transactions = [t.strip() for t in original_reply.split("\n")]
+                d = {}
+                for t in transactions:
+                    try:
+                        number, borrower, owes, lender, amount = t.split(" ")
+                    except Exception as e:
+                        self.log.error(f"Error splitting transaction: {e}")
+                        self.log.info(f"Transaction: {t}")
+                        continue
+                    if borrower.title() != person.title() and lender.title() != person.title():
+                        continue
+                    other = ''
+                    if borrower.title() == person.title():
+                        amount = -float(amount)
+                        other = lender.title()
+                    else:
+                        amount = float(amount)
+                        other = borrower.title()
+                    
+                    person = person.title()
+                    if other not in d:
+                        d[other] = 0
+                    
+                    d[other] += amount
+
+                borrowed_list = []
+                lent_list = []
+
+                for key, value in d.items():
+                    if value == 0:
+                        continue
+                    elif value < 0:
+                        borrowed_list.append(f"- {key}: {-value}")
+                    else:
+                        lent_list.append(f"- {key}: {value}")
+
+                original_reply = f"\n{person}'s Debt Summary\n\nBorrowed:\n{'\n'.join(borrowed_list)}\n\nLent:\n{'\n'.join(lent_list)}"
 
             if not config.enable_prompt_tone:
                 return original_reply

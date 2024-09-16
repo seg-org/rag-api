@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, FastAPI
 from llm import LLM
 from logger import logger
 from middleware import verify_api_key
-from models import AddTextDocumentRequest, AddWebDocumentRequest, RecordMessageRequest
+from models import AddTextDocumentRequest, AddWebDocumentRequest, RecordMessageRequest, AddBorrowMoneyRequest, AskDebtSummaryRequest
 
 app = FastAPI()
 router = APIRouter(prefix="/api/v1", dependencies=[Depends(verify_api_key)])
@@ -45,13 +45,23 @@ async def docs_add_web(request: AddWebDocumentRequest, guild_id: str = None):
 
     return {"reply": reply}
 
+@router.post("/guild/{guild_id}/debt/add-borrow-money")
+async def debt_add_borrow_money(request: AddBorrowMoneyRequest, guild_id: str = None):
+    reply = db.add_borrow_money(request.borrower, request.lender, request.amount, guild_id)
+
+    return {"reply": reply}
+
+@router.post("/guild/{guild_id}/debt/ask-debt-summary")
+async def debt_use_debt_sum(request: AskDebtSummaryRequest, guild_id: str = None):
+    reply = llm.complete_chat(request.person, guild_id, True)
+
+    return {"reply": reply}
 
 @router.get("/guild/{guild_id}/complete-chat")
 async def complete_chat(text: str = None, guild_id: str = None):
     reply = llm.complete_chat(text, guild_id)
 
     return {"reply": reply}
-
 
 app.include_router(router)
 

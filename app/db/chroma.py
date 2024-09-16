@@ -7,7 +7,6 @@ from langchain_community.vectorstores import Chroma
 from langchain_nomic.embeddings import NomicEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-
 class DB:
     def __init__(self, log: Logger):
         self.log = log
@@ -63,4 +62,14 @@ class DB:
             return results
         except Exception as e:
             self.log.error(f"Error getting all texts: {e}")
+            return e.__str__()
+        
+    def add_borrow_money(self, borrower: str, lender: str, amount: float, guild_id: str):
+        try:
+            text = f"{borrower.title()} owes {lender.title()} {amount}"
+
+            self.docs_store.add_texts(texts=[text], metadatas=[{"guild_id": guild_id}])
+            return "Debt added successfully: " + text
+        except Exception as e:
+            self.log.error(f"Error adding text: {e}")
             return e.__str__()
