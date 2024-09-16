@@ -70,25 +70,25 @@ class LLM:
                 description="Search information from the internet",
             )
 
-            wolfram_alpha_tool = WolframAlphaQueryRun(
-                api_wrapper=WolframAlphaAPIWrapper()
-            )
+            # wolfram_alpha_tool = WolframAlphaQueryRun(
+            #     api_wrapper=WolframAlphaAPIWrapper()
+            # )
 
-            yahoo_finance_tool = YahooFinanceNewsTool()
+            # yahoo_finance_tool = YahooFinanceNewsTool()
 
-            google_jobs_tool = GoogleJobsQueryRun(api_wrapper=GoogleJobsAPIWrapper())
-            google_trends_tool = GoogleTrendsQueryRun(api_wrapper=GoogleTrendsAPIWrapper())
-            google_lens_tool = GoogleLensQueryRun(api_wrapper=GoogleLensAPIWrapper())
-            google_serper_tool = GoogleSerperResults(api_wrapper=GoogleSerperAPIWrapper())
-            google_finance_tool = GoogleFinanceQueryRun(api_wrapper=GoogleFinanceAPIWrapper())
-            google_scholar_tool = GoogleScholarQueryRun(api_wrapper=GoogleScholarAPIWrapper())
+            # google_jobs_tool = GoogleJobsQueryRun(api_wrapper=GoogleJobsAPIWrapper())
+            # google_trends_tool = GoogleTrendsQueryRun(api_wrapper=GoogleTrendsAPIWrapper())
+            # google_lens_tool = GoogleLensQueryRun(api_wrapper=GoogleLensAPIWrapper())
+            # google_serper_tool = GoogleSerperResults(api_wrapper=GoogleSerperAPIWrapper())
+            # google_finance_tool = GoogleFinanceQueryRun(api_wrapper=GoogleFinanceAPIWrapper())
+            # google_scholar_tool = GoogleScholarQueryRun(api_wrapper=GoogleScholarAPIWrapper())
 
-            calculator_tool = Tool(
-                name="Calculator",
-                description="Useful for when you need to answer questions about math.",
-                func=LLMMathChain.from_llm(llm=self.chat_completion_model).run,
-                coroutine=LLMMathChain.from_llm(llm=self.chat_completion_model).arun,
-            )
+            # calculator_tool = Tool(
+            #     name="Calculator",
+            #     description="Useful for when you need to answer questions about math.",
+            #     func=LLMMathChain.from_llm(llm=self.chat_completion_model).run,
+            #     coroutine=LLMMathChain.from_llm(llm=self.chat_completion_model).arun,
+            # )
 
             tools = [docs_tool]
             self.log.info(f"Web search enabled: {self.get_enable_web_search(guild_id)}")
@@ -97,11 +97,11 @@ class LLM:
             
             # Maybe add some condition for adding Wolfram 
             # if self.get_something(wolfram_appid):
-            tools.append(wolfram_alpha_tool)
-            tools.append(yahoo_finance_tool)
-            tools.append(calculator_tool)
+            # tools.append(wolfram_alpha_tool)
+            # tools.append(yahoo_finance_tool)
+            # tools.append(calculator_tool)
 
-            tools += [google_jobs_tool, google_lens_tool, google_serper_tool, google_trends_tool, google_finance_tool, google_scholar_tool]
+            # tools += [google_jobs_tool, google_lens_tool, google_serper_tool, google_trends_tool, google_finance_tool, google_scholar_tool]
 
 
             agent_executor = create_react_agent(
