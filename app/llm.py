@@ -58,7 +58,6 @@ class LLM:
 
         tools = [web_docs_tool, web_search_tool, wolfram_alpha_tool]
         
-        tools = [web_docs_tool, web_search_tool]
         self.agent_executor = create_react_agent(
             chat_completion_model, tools, checkpointer=memory
         )
