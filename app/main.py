@@ -54,7 +54,9 @@ async def debt_add_borrow_money(request: AddBorrowMoneyRequest, guild_id: str = 
 @router.post("/guild/{guild_id}/debt/add-split-bill")
 async def debt_add_split_bill(request: AddSplitBillRequest, guild_id: str = None):
     payer = request.payer
-    participants = request.participants.split()
+    participants = [p.strip().title() for p in request.participants.split()]
+    if payer in participants:
+        participants.remove(payer)
     amount = request.amount
     reply = ''
     for p in participants:
