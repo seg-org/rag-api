@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, FastAPI
 from llm import LLM
 from logger import logger
 from middleware import verify_api_key
-from models import AddTextDocumentRequest, AddWebDocumentRequest, RecordMessageRequest, AddBorrowMoneyRequest, AskDebtSummaryRequest
+from models import AddTextDocumentRequest, AddWebDocumentRequest, RecordMessageRequest, AddBorrowMoneyRequest, AddSplitBillRequest, AskDebtSummaryRequest
 
 app = FastAPI()
 router = APIRouter(prefix="/api/v1", dependencies=[Depends(verify_api_key)])
@@ -48,6 +48,17 @@ async def docs_add_web(request: AddWebDocumentRequest, guild_id: str = None):
 @router.post("/guild/{guild_id}/debt/add-borrow-money")
 async def debt_add_borrow_money(request: AddBorrowMoneyRequest, guild_id: str = None):
     reply = db.add_borrow_money(request.borrower, request.lender, request.amount, guild_id)
+
+    return {"reply": reply}
+
+@router.post("/guild/{guild_id}/debt/add-split-bill")
+async def debt_add_split_bill(request: AddSplitBillRequest, guild_id: str = None):
+    payer = request.payer
+    participants = request.participants.split()
+    amount = request.amount
+    reply = ''
+    for p in participants:
+        reply += db.add_borrow_money(p, payer, str(float(amount) / (len(participants) + 1)), guild_id) + '\n'
 
     return {"reply": reply}
 
