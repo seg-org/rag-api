@@ -54,7 +54,7 @@ class DB:
 
     def get_docs_retriever(self, guild_id: str):
         return self.docs_store.as_retriever(
-            search_kwargs={"filter": {"guild_id": guild_id}}
+            search_kwargs={"k": 20, "filter": {"guild_id": guild_id}}
         )
 
     def get_all_docs(self, guild_id: str):
@@ -63,4 +63,16 @@ class DB:
             return results
         except Exception as e:
             self.log.error(f"Error getting all texts: {e}")
+            return e.__str__()
+
+    def add_borrow_money(
+        self, borrower: str, lender: str, amount: float, guild_id: str
+    ):
+        try:
+            text = f"{borrower.title()} owes {lender.title()} {amount}"
+
+            self.docs_store.add_texts(texts=[text], metadatas=[{"guild_id": guild_id}])
+            return "Debt added successfully: " + text
+        except Exception as e:
+            self.log.error(f"Error adding text: {e}")
             return e.__str__()
