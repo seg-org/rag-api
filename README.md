@@ -62,7 +62,7 @@ LANGCHAIN_API_KEY=
 # go to https://tavily.com and create an account + api key (for internet searches when there's no relevant data in rag)
 TAVILY_API_KEY=
 
-# 1. Go to wolfram alpha and sign up for a developer account
+# 1. Go to https://developer.wolframalpha.com/ and sign up for a developer account
 # 2. Create an app and get your APP ID
 # 3. Save your APP ID into WOLFRAM_ALPHA_APPID env variable
 WOLFRAM_ALPHA_APPID=
