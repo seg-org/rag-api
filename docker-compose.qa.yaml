@@ -29,7 +29,7 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-      - API_URL=${API_URL}
+      - API_URL=http://host.docker.internal:3000
       - API_KEY=${API_KEY}
       - BOT_TOKEN=${BOT_TOKEN}
       - BOT_CLIENT_ID=${BOT_CLIENT_ID}
