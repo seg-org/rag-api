@@ -4,12 +4,29 @@ from config import config
 from db import DB
 from langchain.tools.retriever import create_retriever_tool
 from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain_community.tools import WikipediaQueryRun, WolframAlphaQueryRun
-from langchain_community.utilities.wolfram_alpha import WolframAlphaAPIWrapper
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
+from langchain_community.tools import WolframAlphaQueryRun
+from langchain_community.utilities.wolfram_alpha import WolframAlphaAPIWrapper
+from langchain_community.tools.yahoo_finance_news import YahooFinanceNewsTool
+from langchain.chains.llm_math.base import LLMMathChain
+from langchain_community.tools.google_finance.tool import GoogleFinanceQueryRun
+from langchain_community.tools.google_jobs.tool import GoogleJobsQueryRun
+from langchain_community.tools.google_lens.tool import GoogleLensQueryRun
+from langchain_community.tools.google_scholar.tool import GoogleScholarQueryRun
+from langchain_community.tools.google_trends import GoogleTrendsQueryRun
+from langchain_community.tools.google_serper import GoogleSerperResults
+from langchain_core.tools import Tool
+
+
+from langchain_community.utilities.google_finance import GoogleFinanceAPIWrapper
+from langchain_community.utilities.google_jobs import GoogleJobsAPIWrapper
+from langchain_community.utilities.google_lens import GoogleLensAPIWrapper
+from langchain_community.utilities.google_scholar import GoogleScholarAPIWrapper
+from langchain_community.utilities.google_serper import GoogleSerperAPIWrapper
+from langchain_community.utilities.google_trends import GoogleTrendsAPIWrapper
 
 
 class LLM:
@@ -48,23 +65,52 @@ class LLM:
                 "Searches documents in the database that are relevant to query input.",
             )
 
-        web_search_tool = TavilySearchResults(
-            name="web_search_tool", description="Search information from the internet"
-        )
+            web_search_tool = TavilySearchResults(
+                name="web_search_tool",
+                description="Search information from the internet",
+            )
 
-        wolfram_alpha_tool = WolframAlphaQueryRun(
-            api_wrapper=WolframAlphaAPIWrapper()
-        )
+            wolfram_alpha_tool = WolframAlphaQueryRun(
+                api_wrapper=WolframAlphaAPIWrapper()
+            )
 
-        tools = [web_docs_tool, web_search_tool, wolfram_alpha_tool]
-        
-        self.agent_executor = create_react_agent(
-            chat_completion_model, tools, checkpointer=memory
-        )
+            yahoo_finance_tool = YahooFinanceNewsTool()
 
-    def complete_chat(self, query: str) -> str:
-        try:
-            responses = self.agent_executor.stream(
+            google_jobs_tool = GoogleJobsQueryRun(api_wrapper=GoogleJobsAPIWrapper())
+            google_trends_tool = GoogleTrendsQueryRun(api_wrapper=GoogleTrendsAPIWrapper())
+            google_lens_tool = GoogleLensQueryRun(api_wrapper=GoogleLensAPIWrapper())
+            google_serper_tool = GoogleSerperResults(api_wrapper=GoogleSerperAPIWrapper())
+            google_finance_tool = GoogleFinanceQueryRun(api_wrapper=GoogleFinanceAPIWrapper())
+            google_scholar_tool = GoogleScholarQueryRun(api_wrapper=GoogleScholarAPIWrapper())
+
+            calculator_tool = Tool(
+                name="Calculator",
+                description="Useful for when you need to answer questions about math.",
+                func=LLMMathChain.from_llm(llm=self.chat_completion_model).run,
+                coroutine=LLMMathChain.from_llm(llm=self.chat_completion_model).arun,
+            )
+
+            tools = [docs_tool]
+            self.log.info(f"Web search enabled: {self.get_enable_web_search(guild_id)}")
+            if self.get_enable_web_search(guild_id):
+                tools.append(web_search_tool)
+            
+            # Maybe add some condition for adding Wolfram 
+            # if self.get_something(wolfram_appid):
+            tools.append(wolfram_alpha_tool)
+            tools.append(yahoo_finance_tool)
+            tools.append(calculator_tool)
+
+            tools += [google_jobs_tool, google_lens_tool, google_serper_tool, google_trends_tool, google_finance_tool, google_scholar_tool]
+
+
+            agent_executor = create_react_agent(
+                self.chat_completion_model,
+                tools,
+                checkpointer=self.get_memory_for_guild(guild_id),
+            )
+
+            responses = agent_executor.stream(
                 {"messages": [HumanMessage(content=query)]}, config=self.__config
             )
             last_message: AIMessage
