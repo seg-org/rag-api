@@ -39,12 +39,15 @@ To be precise, ReAct Agents are from LangGraph library, which is a part of LangC
 ### Installation
 
 1. Clone this repo
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
+
 2. Copy `.env.template` and paste it in the same directory as `.env` and fill in the values.
+
 ```bash
 # for these, see README.md in the bot repo
 BOT_TOKEN=
@@ -58,7 +61,13 @@ LANGCHAIN_API_KEY=
 
 # go to https://tavily.com and create an account + api key (for internet searches when there's no relevant data in rag)
 TAVILY_API_KEY=
+
+# 1. Go to wolfram alpha and sign up for a developer account
+# 2. Create an app and get your APP ID
+# 3. Save your APP ID into WOLFRAM_ALPHA_APPID env variable
+WOLFRAM_ALPHA_APPID=
 ```
+
 3. Copy `prompt_tone.example.json` in `./app/config` and paste it in the same directory as `prompt_tone.json` and fill in the desired base prompt (what tone should the bot respond to your messages) or keep it as is.
 
 ### Running
